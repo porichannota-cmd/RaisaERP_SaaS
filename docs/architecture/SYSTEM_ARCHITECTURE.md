@@ -1,11 +1,12 @@
-# RAISA ERP — SYSTEM ARCHITECTURE
-**Version:** 1.1.0 | **Date:** 2026-08-09 | **Phase:** 00A
+﻿# RAISA ERP â€” SYSTEM ARCHITECTURE
+**Version:** 1.2.0 | **Date:** 2026-08-09 | **Phase:** 00B
 
 ## Change Log
 | Version | Date | Change |
 |---------|------|--------|
 | 1.0.0 | 2026-08-09 | Initial |
-| 1.1.0 | 2026-08-09 | Global user identity (no tenant_id on users), health endpoint split (/live /ready /detail), font self-hosting, ADR updates |
+| 1.1.0 | 2026-08-09 | Global user identity, health endpoint split, ADR updates
+| 1.2.0 | 2026-08-09 | BIGINT money, scoped grants, multi-source resolvers, queue isolation, ADR-020 to ADR-026 |
 
 ---
 
@@ -165,7 +166,7 @@ Workers:
 ```
 resources/js/
   app.tsx                 - Inertia entrypoint
-  ssr.tsx                 - SSR entrypoint (TypeScript — NOT .jsx)
+  ssr.tsx                 - SSR entrypoint (TypeScript â€” NOT .jsx)
   components/
     ui/                   - BEFDS primitives (Button, Input, Card, etc.)
     shared/               - Shared compound components
@@ -255,9 +256,9 @@ resources/js/
 - Error Tracking: Sentry (when configured)
 - Performance: Laravel Telescope (dev), Pulse (production)
 - Health Checks:
-    GET /health/live   — public liveness probe (minimal info)
-    GET /health/ready  — public readiness probe (minimal info)
-    GET /health/detail — privileged dependency detail (internal only)
+    GET /health/live   â€” public liveness probe (minimal info)
+    GET /health/ready  â€” public readiness probe (minimal info)
+    GET /health/detail â€” privileged dependency detail (internal only)
 - Uptime: External uptime monitor
 
 ---
@@ -286,7 +287,16 @@ resources/js/
 | ADR-017 | Health endpoints | /health/live + /health/ready (public, minimal) + /health/detail (privileged) | Security: minimal info exposure |
 | ADR-018 | Fonts | Self-hosted WOFF2 (Inter + Hind Siliguri) | No runtime Google Fonts dependency |
 | ADR-019 | Capability enforcement | Backend: capability middleware + service gate; Frontend: UX only | I26: backend is authoritative |
+| ADR-020 | Money storage unit | BIGINT SIGNED integer minor units | I28: replaces DECIMAL for amounts |
+| ADR-021 | Authorization grants | Scoped grants (permission + scope_type + scope_id) | I29: no independent permission/scope union |
+| ADR-022 | Data ownership | Global personal vs tenant-membership tables separated | I30 |
+| ADR-023 | Tenant context sources | 8 resolver adapters | I18: one canonical resolver per context |
+| ADR-024 | Queue tenant safety | Job payload carries tenant+actor+correlation | I31, I32 |
+| ADR-025 | Domain events | TenantDomainEvent + outbox pattern | I33 |
+| ADR-026 | Position history | Effective-dated position_assignments | I35 |
 
 ---
 
-*Document Owner: Principal Architect | v1.1.0 | Next Review: Wave 1 Start*
+*Document Owner: Principal Architect | v1.2.0 | Next Review: Wave 1 Start*
+
+

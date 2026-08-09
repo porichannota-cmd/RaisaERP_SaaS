@@ -1,5 +1,5 @@
 ﻿# RAISA ERP — REGISTRATION ENGINE
-**Version:** 1.1.0 | **Date:** 2026-08-09 | **Phase:** 00A
+**Version:** 1.2.0 | **Date:** 2026-08-09 | **Phase:** 00B
 
 ## Change Log
 | Version | Date | Change |
@@ -189,10 +189,10 @@ ADDRESS (via user_addresses — multiple, type-tagged)
           Street/Road, Holding/Flat, Post Code
   Optional: map pin (with explicit user consent + business purpose disclosure)
 
-BANKING (via user_banking_details — RESTRICTED)
+BANKING (via membership_bank_accounts — RESTRICTED)
   Bank, Branch, Account Name, Account Number (field-encrypted), Routing, IBAN, SWIFT
 
-MFS (via user_mfs_accounts)
+MFS (via membership_mfs_accounts)
   bKash, Nagad, Rocket, Upay, other
 
 LEGAL / KYC DOCUMENTS (via user_documents + Media Engine)
@@ -298,4 +298,28 @@ NID uniqueness for encrypted fields: application-level check using encrypted com
 
 ---
 
-*Document Owner: Principal Architect | v1.1.0 | Invariants: I10, I11, I12, I15, I16, I23, I24*
+---
+
+## 10. Table Name Alignment (NEW v1.2.0)
+
+Global personal tables (user-owned):
+  user_personal_profiles, user_personal_contacts, user_personal_addresses,
+  user_personal_kyc, user_personal_documents
+
+Tenant-membership tables (step 2/3 of registration):
+  tenant_memberships, membership_profiles, membership_addresses,
+  membership_bank_accounts, membership_mfs_accounts, membership_documents,
+  membership_contracts, membership_employment, membership_business_profiles
+
+Company-owned (NOT on user):
+  company_licenses (TIN, Trade License, VAT) — on companies table
+
+(I30) See DATA_OWNERSHIP.md.
+
+Position assignments:
+  position_assignments — effective-dated, new record per promotion
+  Position reference number is NOT identity (I24, I35)
+
+*Document Owner: Principal Architect | v1.2.0 | Invariants: I10, I11, I12, I15, I16, I23, I24, I30, I35*
+
+

@@ -77,7 +77,7 @@ No temporary uploaders. No temporary OTP systems. (I15, I16)
 - `tenant_memberships` migration (user_id, tenant_id, status, invited_by, joined_at)
 - `tenant_membership_roles` migration (membership_id, role_key, company_id, branch_id, etc.)
 - `active_tenant_sessions` migration (user_id, session_id, tenant_id)
-- `position_assignments` migration (user_id, tenant_id, position_code, reference_number)
+- `position_assignments` migration (user_id, tenant_id, position_code, reference_number, effective_from, effective_to, status — effective-dated)
 - Spatie permission tables (roles, permissions, model_has_roles, etc.)
 - Role definitions seeder: SA, TA, initial roles
 - Permission seeder: initial platform permissions
@@ -147,7 +147,7 @@ No temporary uploaders. No temporary OTP systems. (I15, I16)
 ### Scope
 - `users` table migration (global, no tenant_id — USR-2026-XXXXXXXX ID)
 - `user_profiles`, `user_addresses`, `user_contacts` migrations
-- `user_kyc_records`, `user_banking_details`, `user_mfs_accounts` migrations
+- `user_personal_kyc`, `membership_bank_accounts`, `membership_mfs_accounts` migrations
 - `user_documents`, `user_contract_acceptances` migrations
 - `employment_details` migration (tenant-scoped)
 - `GlobalUserIdGenerator` (USR-{YEAR}-{8CHAR})
@@ -392,3 +392,5 @@ No wave is certified without all gates in CERTIFICATION_GATES.md passing.
 ---
 
 *Document Owner: Principal Architect | v1.1.0*
+
+

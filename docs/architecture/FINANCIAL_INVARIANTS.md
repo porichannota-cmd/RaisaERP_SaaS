@@ -1,11 +1,12 @@
-﻿# RAISA ERP — FINANCIAL INVARIANTS
-**Version:** 1.1.0 | **Date:** 2026-08-09 | **Phase:** 00A
+# RAISA ERP — FINANCIAL INVARIANTS
+**Version:** 1.2.0 | **Date:** 2026-08-09 | **Phase:** 00B
 
 ## Change Log
 | Version | Date | Change |
 |---------|------|--------|
 | 1.0.0 | 2026-08-09 | Initial |
-| 1.1.0 | 2026-08-09 | Resolved DECIMAL vs integer contradiction, defined canonical money model, payment provider routing correction |
+| 1.1.0 | 2026-08-09 | Resolved DECIMAL vs integer contradiction, payment provider routing
+| 1.2.0 | 2026-08-09 | Freeze BIGINT minor units as canonical standard, ledger schema updated, overflow analysis |
 
 ---
 
@@ -259,4 +260,36 @@ Every finance-affecting feature must pass:
 
 ---
 
-*Document Owner: FinTech Architect | v1.1.0 | Invariants: I03, I04, I05, I17, I25*
+## 11. Canonical Money Database Contract (FROZEN v1.2.0)
+
+`sql
+-- ALL transactional monetary amounts: BIGINT SIGNED
+amount_minor    BIGINT SIGNED NOT NULL
+currency_code   CHAR(3) NOT NULL
+
+-- Rates, percentages, ratios: DECIMAL only
+tax_rate        DECIMAL(20,10) NOT NULL
+exchange_rate   DECIMAL(20,10) NOT NULL
+commission_rate DECIMAL(20,10) NOT NULL
+
+-- FORBIDDEN in new schema (examples of what NOT to use):
+-- amount FLOAT          -- precision loss, forbidden
+-- amount DOUBLE         -- precision loss, forbidden
+-- amount DECIMAL(10,2)  -- insufficient precision
+-- amount DECIMAL(20,6)  -- old pattern; BIGINT minor units supersedes
+`
+
+JSON wire format:
+`json
+{ "amount_minor": "123450", "currency": "BDT", "formatted": "৳1,234.50" }
+`
+
+- mount_minor: STRING (not int) — prevents JSON float precision loss
+- ormatted: presentation only — never stored, never used in calculations
+
+See MONEY_MODEL.md for the full canonical specification.
+
+---
+
+*Document Owner: FinTech Architect | v1.2.0 | Invariants: I03, I04, I05, I17, I25, I28*
+

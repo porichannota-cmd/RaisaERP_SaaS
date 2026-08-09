@@ -1,11 +1,12 @@
 ﻿# RAISA ERP — MODULE DEPENDENCY MAP
-**Version:** 1.1.0 | **Date:** 2026-08-09 | **Phase:** 00A
+**Version:** 1.2.0 | **Date:** 2026-08-09 | **Phase:** 00B
 
 ## Change Log
 | Version | Date | Change |
 |---------|------|--------|
 | 1.0.0 | 2026-08-09 | Initial |
-| 1.1.0 | 2026-08-09 | W1 split into W1/W1A/W1B/W1C, global user identity model, media/OTP prerequisites |
+| 1.1.0 | 2026-08-09 | W1 split into W1/W1A/W1B/W1C, global user identity model
+| 1.2.0 | 2026-08-09 | BIGINT money, scoped grants, global/membership data separation, 8 new architecture documents |
 
 ---
 
@@ -59,8 +60,8 @@ Users (global, no tenant_id)
   -> user_profiles         (personal info)
   -> user_addresses        (type-tagged locations)
   -> user_contacts         (secondary mobiles, social)
-  -> user_banking_details  (field-encrypted)
-  -> user_mfs_accounts     (bKash, Nagad, etc.)
+  -> membership_bank_accounts (field-encrypted per membership)
+  -> membership_mfs_accounts  (bKash, Nagad, etc. per membership)
   -> user_kyc_records      (NID, passport — via Media Engine)
   -> user_documents        (TIN, Trade License — via Media Engine)
   -> user_contract_acceptances (immutable legal audit)
@@ -177,4 +178,26 @@ delivers a minimum viable ERP for a basic retail business with:
 
 ---
 
-*Document Owner: Principal Architect | v1.1.0*
+---
+
+## New Documents Added in Phase 00B
+
+| Document | Purpose |
+|----------|---------|
+| MONEY_MODEL.md | Canonical BIGINT money specification |
+| AUTHORIZATION_GRANTS.md | Scoped permission grant model (I29) |
+| DATA_OWNERSHIP.md | Global vs membership data separation (I30) |
+| TENANT_CONTEXT_RESOLVERS.md | Multi-source context resolvers (I18, I31) |
+| QUEUE_TENANT_SAFETY.md | Job tenant safety (I31, I32) |
+| DOMAIN_EVENTS.md | Event tenant safety + outbox (I33) |
+| CACHE_SAFETY.md | Cache key safety (I34) |
+| POSITION_HISTORY.md | Effective-dated position history (I35) |
+| AUDIT_MODEL.md | Audit actor types and schema (I21) |
+
+Total architecture documents: **32** (was 23 after Phase 00A)
+
+---
+
+*Document Owner: Principal Architect | v1.2.0*
+
+

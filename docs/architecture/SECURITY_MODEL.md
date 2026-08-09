@@ -1,11 +1,12 @@
 ﻿# RAISA ERP — SECURITY MODEL
-**Version:** 1.1.0 | **Date:** 2026-08-09 | **Phase:** 00A
+**Version:** 1.2.0 | **Date:** 2026-08-09 | **Phase:** 00B
 
 ## Change Log
 | Version | Date | Change |
 |---------|------|--------|
 | 1.0.0 | 2026-08-09 | Initial |
-| 1.1.0 | 2026-08-09 | Multi-scope RBAC, capability enforcement backend authority, membership-based auth |
+| 1.1.0 | 2026-08-09 | Multi-scope RBAC, capability enforcement backend authority, membership-based auth
+| 1.2.0 | 2026-08-09 | Scoped authorization grant model (I29), audit actor types, queue job context requirements |
 
 ---
 
@@ -311,4 +312,37 @@ class WebhookSignatureVerifier
 
 ---
 
-*Document Owner: Security Architect | v1.1.0 | Invariants: I09, I10, I21, I26*
+---
+
+## 9. Scoped Authorization Grant Model (NEW v1.2.0)
+
+Authorization grants are ATOMIC TRIPLES (I29):
+  { permission_key + scope_type + scope_id }
+
+Scope types: TENANT > COMPANY > BRANCH > WAREHOUSE > DEPARTMENT > TERRITORY > OWN
+
+Rules:
+- Permissions and scopes are NOT independently unioned
+- A broad scope from one role NEVER widens a sensitive permission from another role
+- Each grant is evaluated independently against the resource being accessed
+- Constraints (amount ceilings, MFA requirement, IP whitelist) can narrow a grant further
+
+See AUTHORIZATION_GRANTS.md for full specification.
+
+---
+
+## 10. Audit Actor Model (NEW v1.2.0)
+
+Actor types:
+  USER | PLATFORM_ADMIN | SYSTEM | QUEUE_WORKER | SCHEDULED_JOB | API_CLIENT | WEBHOOK
+
+Every privileged action records: tenant_id, actor_type, actor_id, impersonator_id,
+correlation_id, request_id, IP/user-agent (for interactive actors).
+Secrets NEVER logged. Audit log is IMMUTABLE. (I21, I10)
+
+See AUDIT_MODEL.md for full specification.
+
+---
+
+*Document Owner: Security Architect | v1.2.0 | Invariants: I09, I10, I21, I26, I29*
+

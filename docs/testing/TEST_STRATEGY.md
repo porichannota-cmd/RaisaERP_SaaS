@@ -1,5 +1,5 @@
 ﻿# RAISA ERP — TEST STRATEGY
-**Version:** 1.0.0 | **Date:** 2026-08-09
+**Version:** 1.1.0 | **Date:** 2026-08-09 | **Phase:** 00B
 
 ---
 
@@ -254,3 +254,52 @@ E2E:     tests/E2E/{Journey}Test.spec.ts
 ---
 
 *Document Owner: QA Architect | Invariant: I22*
+
+## New Test Categories (Phase 00B)
+
+### Money Model Tests
+- [ ] All amount columns are BIGINT, not FLOAT/DOUBLE/DECIMAL
+- [ ] Money VO uses bcmath (no native PHP float arithmetic)
+- [ ] BIGINT overflow check before large multiplication
+- [ ] JSON response: amount_minor is STRING, not numeric
+- [ ] Tax rounding: HALF_UP per line item, not sum-then-round
+
+### Scoped Authorization Grant Tests (I29)
+- [ ] Tenant-wide VIEW grant does NOT upgrade BRANCH-scoped APPROVE grant
+- [ ] Grant covering branch_A does NOT authorize action on branch_B resource
+- [ ] Amount ceiling constraint blocks approval above ceiling
+- [ ] Expired grant returns 403
+- [ ] Revoked grant returns 403
+- [ ] Multi-role composition: no scope bleed between grants
+
+### Queue Tenant Isolation Tests (I31, I32)
+- [ ] Job uses tenant from payload, not ambient app state
+- [ ] Context cleared after successful job
+- [ ] Context cleared after failed job (finally{} guaranteed)
+- [ ] Tenant A job cannot access Tenant B data
+- [ ] Cross-tenant negative test for every new tenant-scoped job
+
+### Cache Safety Tests (I34)
+- [ ] Tenant A cache not visible to Tenant B
+- [ ] Capability cache invalidated on module disable
+- [ ] Permission cache invalidated on membership revocation
+- [ ] Cache key includes tenant_id for all tenant-specific data
+
+### Domain Event Tests (I33)
+- [ ] Event contains tenant_id and correlation_id
+- [ ] Listener reads tenant from event, not app state
+- [ ] Outbox record includes tenant_id + correlation_id
+- [ ] Failed delivery retried with backoff, not dropped
+
+### Position History Tests (I35)
+- [ ] Promotion creates new record, does not mutate old
+- [ ] Old record has effective_to set correctly
+- [ ] New record has new reference_number
+- [ ] getPositionAtTime returns correct historical position
+- [ ] global_user_id unchanged after promotion
+
+### Health Endpoint Tests
+- [ ] /health/live returns minimal response (no internals)
+- [ ] /health/ready returns minimal response
+- [ ] /health/detail returns 401/403 without internal token
+

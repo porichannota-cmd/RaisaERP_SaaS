@@ -1,11 +1,12 @@
 ﻿# RAISA ERP — MULTI-TENANCY STRATEGY
-**Version:** 1.1.0 | **Date:** 2026-08-09 | **Phase:** 00A
+**Version:** 1.2.0 | **Date:** 2026-08-09 | **Phase:** 00B
 
 ## Change Log
 | Version | Date | Change |
 |---------|------|--------|
 | 1.0.0 | 2026-08-09 | Initial |
-| 1.1.0 | 2026-08-09 | Global user identity, membership model, active tenant context, MySQL isolation defense |
+| 1.1.0 | 2026-08-09 | Global user identity, membership model, active tenant context, MySQL isolation defense
+| 1.2.0 | 2026-08-09 | Multi-source TenantContext resolvers, cache safety, global vs membership data separation, effective-dated positions |
 
 ---
 
@@ -370,4 +371,48 @@ class SuperAdminCrossTenantService
 
 ---
 
-*Document Owner: Principal Architect | v1.1.0 | Invariants: I01, I02, I18, I23, I24*
+---
+
+## 11. Global vs Membership Data (NEW v1.2.0)
+
+Global personal data (user-owned, platform-wide):
+  user_personal_profiles, user_personal_contacts, user_personal_addresses,
+  user_personal_kyc, user_personal_documents
+
+Tenant-membership data (membership-owned):
+  membership_profiles, membership_addresses, membership_bank_accounts,
+  membership_mfs_accounts, membership_documents, membership_contracts,
+  membership_employment, membership_business_profiles
+
+Company/legal entity data (company-owned):
+  companies.tin_number, company_licenses (Trade License, drug license, etc.)
+
+(Invariant I30) See DATA_OWNERSHIP.md.
+
+---
+
+## 12. Multi-Source TenantContext Resolvers (NEW v1.2.0)
+
+TenantContext works for:
+  web session, API token, mobile app, service principal, webhook,
+  queue job, scheduled task, CLI, SA cross-tenant access
+
+Each source has a dedicated resolver adapter.
+Context established per-request/job and cleared in finally{}.
+See TENANT_CONTEXT_RESOLVERS.md.
+
+---
+
+## 13. Cache Safety (NEW v1.2.0)
+
+All tenant-derived cache keys include tenant_id:
+  tenant:{tenantId}:{resource}:{qualifier}
+
+Invalidate on: permission change, capability change, subscription change,
+membership revocation, tenant suspension.
+(Invariant I34) See CACHE_SAFETY.md.
+
+---
+
+*Document Owner: Principal Architect | v1.2.0 | Invariants: I01, I02, I18, I23, I24, I30, I31, I34*
+

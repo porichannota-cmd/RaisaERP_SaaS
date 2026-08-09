@@ -1,5 +1,5 @@
 ﻿# RAISA ERP — CERTIFICATION GATES
-**Version:** 1.0.0 | **Date:** 2026-08-09
+**Version:** 1.1.0 | **Date:** 2026-08-09 | **Phase:** 00B
 
 ---
 
@@ -152,3 +152,21 @@ Notes: [Any exceptions or deferred items]
 ---
 
 *Document Owner: QA Architect*
+
+## Additional Certification Gates (Phase 00B)
+
+### Wave 1 / 1A / 1B / 1C
+- [ ] Money VO: BIGINT minor units, bcmath arithmetic, no float
+- [ ] All mount_minor DB columns are BIGINT SIGNED
+- [ ] Cache keys include tenant_id for all tenant-derived data
+- [ ] TenantContextManager: all 8 resolver adapters registered
+
+### Wave 2+
+- [ ] Scoped authorization grants implemented (AUTHORIZATION_GRANTS.md)
+- [ ] Privilege composition negative tests pass (I29)
+- [ ] All queue jobs implement TenantScopedJob + carry payload
+- [ ] Job context cleared in finally{} (isolation test passes)
+- [ ] Domain events implement TenantDomainEvent contract
+- [ ] Outbox records contain tenant_id + correlation_id
+- [ ] Position assignment: effective-dated (promotion creates new record)
+

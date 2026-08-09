@@ -1,11 +1,12 @@
-﻿# RAISA ERP — DATABASE GOVERNANCE
-**Version:** 1.1.0 | **Date:** 2026-08-09 | **Phase:** 00A
+# RAISA ERP — DATABASE GOVERNANCE
+**Version:** 1.2.0 | **Date:** 2026-08-09 | **Phase:** 00B
 
 ## Change Log
 | Version | Date | Change |
 |---------|------|--------|
 | 1.0.0 | 2026-08-09 | Initial |
-| 1.1.0 | 2026-08-09 | Normalized user/identity model, money model resolution, MySQL isolation rules |
+| 1.1.0 | 2026-08-09 | Normalized user/identity model, money model resolution, MySQL isolation rules
+| 1.2.0 | 2026-08-09 | BIGINT minor units as canonical money storage, global vs membership data separation |
 
 ---
 
@@ -75,7 +76,7 @@ user_contacts
   -- types: secondary_mobile, whatsapp, linkedin, facebook, website, etc.
 
 -- Banking details (RESTRICTED — field-encrypted)
-user_banking_details
+membership_bank_accounts
   id, user_id FK, bank_name, branch_name,
   account_name,
   account_number VARCHAR(255) -- field-encrypted (CipherSweet or Laravel encryption)
@@ -83,7 +84,7 @@ user_banking_details
   is_primary BOOLEAN, verified BOOLEAN, created_at, updated_at
 
 -- MFS accounts (CONFIDENTIAL)
-user_mfs_accounts
+membership_mfs_accounts
   id, user_id FK,
   provider ENUM('bkash','nagad','rocket','upay','other'),
   mobile VARCHAR(20), is_primary BOOLEAN, verified BOOLEAN,
@@ -234,10 +235,10 @@ currency    CHAR(3) NOT NULL DEFAULT 'BDT'
 -- High-precision rate column (FX rate, tax rate, interest rate)
 rate        DECIMAL(20, 10) NOT NULL
 
--- FORBIDDEN:
-amount FLOAT          -- precision loss
-amount DOUBLE         -- precision loss
-amount DECIMAL(10,2)  -- insufficient precision
+-- FORBIDDEN (examples of what NOT to use):
+-- amount FLOAT          -- precision loss
+-- amount DOUBLE         -- precision loss
+-- amount DECIMAL(10,2)  -- insufficient precision
 ```
 
 ---
@@ -372,4 +373,8 @@ audit_logs
 
 ---
 
-*Document Owner: Database Architect | v1.1.0 | Review: Each wave*
+*Document Owner: Database Architect | v1.2.0 | Review: Each wave*
+
+> See MONEY_MODEL.md for canonical money specification. See DATA_OWNERSHIP.md for global vs membership data separation.
+
+

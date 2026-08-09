@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
+        $middleware->append(\App\Http\Middleware\CorrelationIdMiddleware::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
