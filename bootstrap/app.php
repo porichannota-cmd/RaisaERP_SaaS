@@ -18,7 +18,35 @@ return Application::configure(basePath: dirname(__DIR__))
             AddLinkHeadersForPreloadedAssets::class,
         ]);
         $middleware->append(\App\Http\Middleware\CorrelationIdMiddleware::class);
+        $middleware->append(\App\Http\Middleware\SecurityHeadersMiddleware::class);
     })
-    ->withExceptions(function (Exceptions $exceptions) {
-        //
+        ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->shouldRenderJsonWhen(function (\Illuminate\Http\Request $request, \Throwable $e) {
+            return $request->is('api/*') || $request->expectsJson();
+        });
+
+        $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                $status = $e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface 
+                    ? $e->getStatusCode() 
+                    : 500;
+                    
+                if ($e instanceof \Illuminate\Validation\ValidationException) {
+                    $status = $e->status;
+                    return response()->json([
+                        'error' => 'Validation Failed',
+                        'message' => $e->getMessage(),
+                        'errors' => $e->errors(),
+                        'correlation_id' => $request->header('X-Correlation-ID'),
+                    ], $status);
+                }
+
+                return response()->json([
+                    'error' => class_basename($e),
+                    'message' => config('app.debug') ? $e->getMessage() : 'Server Error',
+                    'correlation_id' => $request->header('X-Correlation-ID'),
+                ], $status);
+            }
+        });
     })->create();
+
