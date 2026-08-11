@@ -39,7 +39,7 @@ Extended data lives in normalized tables.
 ```sql
 -- GLOBAL identity (no tenant_id)
 users
-  id                  CHAR(26) PK
+  id                  BIGINT PK (per ADR_USER_ID_COMPATIBILITY)
   global_user_id      VARCHAR(20) UNIQUE NOT NULL  -- USR-2026-XXXXXXXX, immutable
   mobile              VARCHAR(20) UNIQUE NOT NULL
   mobile_verified     BOOLEAN DEFAULT FALSE

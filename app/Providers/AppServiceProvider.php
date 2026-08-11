@@ -11,7 +11,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(\App\Domain\IAM\Contracts\ScopeTargetValidator::class, \App\Domain\IAM\Services\DefaultScopeTargetValidator::class);
     }
 
     /**
@@ -19,6 +19,28 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        \Illuminate\Support\Facades\Gate::before(function ($user, $ability, $arguments = []) {
+            $scopeType = null;
+            $scopeId = null;
+
+            if (count($arguments) >= 1 && is_string($arguments[0])) {
+                $scopeType = $arguments[0];
+                if (count($arguments) >= 2 && is_string($arguments[1])) {
+                    $scopeId = $arguments[1];
+                }
+            }
+
+            $resolver = app(\App\Domain\IAM\Services\AuthorizationResolver::class);
+
+            if ($resolver->check($user, $ability, $scopeType, $scopeId)) {
+                return true;
+            }
+
+            if ($resolver->isAuthoritative($ability)) {
+                return false;
+            }
+
+            return null;
+        });
     }
 }

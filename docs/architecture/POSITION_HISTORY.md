@@ -1,4 +1,4 @@
-﻿# RAISA ERP — EFFECTIVE-DATED POSITION ASSIGNMENT HISTORY
+# RAISA ERP — EFFECTIVE-DATED POSITION ASSIGNMENT HISTORY
 **Version:** 1.0.0 | **Date:** 2026-08-09 | **Phase:** 00B
 
 ---
@@ -17,20 +17,19 @@ Historical documents (invoices, approvals, payroll) resolve the position valid A
 ```sql
 position_assignments
   id              CHAR(26) PK ULID
-  user_id         CHAR(26) NOT NULL FK -> users.id
-  tenant_id       CHAR(26) NOT NULL FK -> tenants.id
+  membership_id   CHAR(26) NOT NULL FK -> tenant_memberships.id
   position_code   VARCHAR(50) NOT NULL      -- e.g., 'TA', 'DIR-FIN', 'DD', 'CUST'
   reference_number VARCHAR(30) NOT NULL UNIQUE  -- e.g., 'TA-2026-Q8M7R2P4' (immutable per record)
   status          ENUM('active','ended','cancelled') DEFAULT 'active'
   effective_from  DATE NOT NULL
   effective_to    DATE NULL                 -- NULL = currently active
-  ended_by        CHAR(26) NULL FK -> users.id
+  ended_by        BIGINT NULL FK -> users.id
   ended_reason    VARCHAR(255) NULL
   notes           TEXT NULL
   created_at, updated_at
-  INDEX idx_pa_user_tenant (user_id, tenant_id)
-  INDEX idx_pa_user_tenant_status (user_id, tenant_id, status)
-  INDEX idx_pa_effective (user_id, tenant_id, effective_from, effective_to)
+  INDEX idx_pa_membership (membership_id)
+  INDEX idx_pa_membership_status (membership_id, status)
+  INDEX idx_pa_effective (membership_id, effective_from, effective_to)
   UNIQUE idx_ref_num (reference_number)
 ```
 
