@@ -29,3 +29,7 @@ yarn-error.log
 /node_modules
 /public/build
 /database/*.sqlite
+
+.env.testing
+post_incident_snapshot.sql
+node_modules
