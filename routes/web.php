@@ -25,5 +25,8 @@ Route::post('api/otp/send', [OtpController::class, 'send'])->name('api.otp.send'
 Route::post('api/otp/verify', [OtpController::class, 'verify'])->name('api.otp.verify');
 Route::post('api/otp/resend', [OtpController::class, 'resend'])->name('api.otp.resend');
 
+// Health Check
+Route::get('api/health', [\App\Http\Controllers\Api\HealthCheckController::class, 'index'])->name('api.health');
+
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
