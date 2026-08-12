@@ -29,5 +29,6 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="REGISTRATION_SESSION_HMAC_SECRET" value="12345678901234567890123456789012" force="true"/>
     </php>
 </phpunit>

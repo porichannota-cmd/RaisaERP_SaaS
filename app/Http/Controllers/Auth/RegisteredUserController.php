@@ -17,35 +17,21 @@ class RegisteredUserController extends Controller
 {
     /**
      * Show the registration page.
+     * Wave 2B PA Decision: GET /register -> transition to Wave 2 registration entry without redirect loops.
      */
-    public function create(): Response
+    public function create(Request $request): Response|\Illuminate\Http\RedirectResponse
     {
+        // If a frontend SPA path for new registration exists, Inertia::render it.
+        // For now, we render a placeholder or the same auth/register but ensure it directs to API.
         return Inertia::render('auth/register');
     }
 
     /**
      * Handle an incoming registration request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
+     * Wave 2B PA Decision: POST /register -> 410 Gone
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        event(new Registered($user));
-
-        Auth::login($user);
-
-        return to_route('dashboard');
+        abort(410, 'Legacy registration is no longer supported. Please use the mobile-first registration API.');
     }
 }

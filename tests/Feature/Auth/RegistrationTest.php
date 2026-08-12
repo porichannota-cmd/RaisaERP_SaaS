@@ -16,7 +16,7 @@ class RegistrationTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_new_users_can_register()
+    public function test_legacy_registration_returns_410_gone(): void
     {
         $response = $this->post('/register', [
             'name' => 'Test User',
@@ -25,7 +25,6 @@ class RegistrationTest extends TestCase
             'password_confirmation' => 'password',
         ]);
 
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $response->assertStatus(410);
     }
 }

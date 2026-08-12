@@ -16,6 +16,22 @@ Route::middleware('guest')->group(function () {
 
     Route::post('register', [RegisteredUserController::class, 'store']);
 
+    // Wave 2B Registration API Routes
+    Route::prefix('api/registration')->name('registration.')->group(function () {
+        Route::post('initiate', [\App\Http\Controllers\Auth\RegistrationOrchestrationController::class, 'initiate'])
+            ->name('initiate');
+
+        Route::post('otp/send', [\App\Http\Controllers\Auth\RegistrationOrchestrationController::class, 'sendOtp'])
+            ->middleware('throttle:6,1') // Rate limit OTP sending
+            ->name('otp.send');
+
+        Route::post('otp/verify', [\App\Http\Controllers\Auth\RegistrationOrchestrationController::class, 'verifyOtp'])
+            ->name('otp.verify');
+
+        Route::post('account', [\App\Http\Controllers\Auth\RegistrationOrchestrationController::class, 'createAccount'])
+            ->name('account.create');
+    });
+
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 

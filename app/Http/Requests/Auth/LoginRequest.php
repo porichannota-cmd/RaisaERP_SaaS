@@ -27,7 +27,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'identifier' => ['required', 'string'],
             'password' => ['required', 'string'],
         ];
     }
@@ -39,17 +39,32 @@ class LoginRequest extends FormRequest
      */
     public function authenticate(): void
     {
-        $this->ensureIsNotRateLimited();
+        $resolver = app(\App\Domain\Registration\Services\LoginIdentifierResolver::class);
+        $accessPolicy = app(\App\Domain\Registration\Policies\AccountAccessPolicy::class);
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+        $this->ensureIsNotRateLimited($resolver);
+
+        $credentials = $resolver->resolveCredentials($this->string('identifier')->toString(), $this->string('password')->toString());
+        // DEBUG: uncomment if needed: \Illuminate\Support\Facades\Log::info(json_encode($credentials));
+
+        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
+            RateLimiter::hit($this->throttleKey($resolver));
 
             throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
+                'identifier' => __('auth.failed'),
             ]);
         }
 
-        RateLimiter::clear($this->throttleKey());
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        try {
+            $accessPolicy->ensureCanAuthenticate($user);
+        } catch (ValidationException $e) {
+            Auth::logout();
+            throw $e;
+        }
+
+        RateLimiter::clear($this->throttleKey($resolver));
     }
 
     /**
@@ -57,18 +72,18 @@ class LoginRequest extends FormRequest
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function ensureIsNotRateLimited(): void
+    public function ensureIsNotRateLimited(\App\Domain\Registration\Services\LoginIdentifierResolver $resolver): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        if (! RateLimiter::tooManyAttempts($this->throttleKey($resolver), 5)) {
             return;
         }
 
         event(new Lockout($this));
 
-        $seconds = RateLimiter::availableIn($this->throttleKey());
+        $seconds = RateLimiter::availableIn($this->throttleKey($resolver));
 
         throw ValidationException::withMessages([
-            'email' => __('auth.throttle', [
+            'identifier' => __('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
@@ -78,8 +93,9 @@ class LoginRequest extends FormRequest
     /**
      * Get the rate limiting throttle key for the request.
      */
-    public function throttleKey(): string
+    public function throttleKey(\App\Domain\Registration\Services\LoginIdentifierResolver $resolver): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        $canonicalIdentifier = $resolver->resolveRateLimitKey($this->string('identifier')->toString());
+        return \Illuminate\Support\Str::transliterate($canonicalIdentifier.'|'.$this->ip());
     }
 }
