@@ -16,7 +16,8 @@ class RegistrationAccountService
 {
     public function __construct(
         private readonly RegistrationSessionTokenService $tokenService,
-        private readonly EnterpriseUserIdGenerator $idGenerator
+        private readonly EnterpriseUserIdGenerator $idGenerator,
+        private readonly RegistrationIdentityDocumentClaimService $claimService
     ) {}
 
     /**
@@ -71,7 +72,7 @@ class RegistrationAccountService
             $enterpriseId = $this->idGenerator->generate();
 
             // Create user securely, bypassing fillable restrictions as this is a controlled internal service boundary
-            $user = new User();
+            $user = new User;
             $user->forceFill([
                 'enterprise_user_id' => $enterpriseId,
                 'mobile_canonical' => $session->mobile_canonical,
@@ -81,8 +82,8 @@ class RegistrationAccountService
                 'registration_source' => $session->registration_source,
                 'mobile_verified_at' => $session->otp_verified_at,
                 // The name is not in Stage 1 requirements directly, but we can set a placeholder or leave null if nullable.
-                // Assuming `name` is required by the original table. Let's provide a default placeholder if needed, 
-                // or require it in the function signature. Wait, the prompt says "User provides password and optional email". 
+                // Assuming `name` is required by the original table. Let's provide a default placeholder if needed,
+                // or require it in the function signature. Wait, the prompt says "User provides password and optional email".
                 // Nothing about 'name'. In Laravel, `name` is usually required. I'll pass a placeholder or let DB default handle it.
                 'name' => $name ?? 'New User', // Placeholder to satisfy DB if required. Will be completed in Stage 2.
             ]);
@@ -94,6 +95,10 @@ class RegistrationAccountService
                 'consumed_at' => now(),
                 'last_activity_at' => now(),
             ]);
+
+            // Claim any pre-user identity documents securely to this new user.
+            // If this fails internally, it logs a critical error but does not fail the transaction.
+            $this->claimService->claimDocumentsForUser($session, $user);
 
             return $user;
         });

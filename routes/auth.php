@@ -7,6 +7,8 @@ use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\RegistrationIdentityDocumentController;
+use App\Http\Controllers\Auth\RegistrationOrchestrationController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,18 +20,27 @@ Route::middleware('guest')->group(function () {
 
     // Wave 2B Registration API Routes
     Route::prefix('api/registration')->name('registration.')->group(function () {
-        Route::post('initiate', [\App\Http\Controllers\Auth\RegistrationOrchestrationController::class, 'initiate'])
+        Route::post('initiate', [RegistrationOrchestrationController::class, 'initiate'])
             ->name('initiate');
 
-        Route::post('otp/send', [\App\Http\Controllers\Auth\RegistrationOrchestrationController::class, 'sendOtp'])
+        Route::post('otp/send', [RegistrationOrchestrationController::class, 'sendOtp'])
             ->middleware('throttle:6,1') // Rate limit OTP sending
             ->name('otp.send');
 
-        Route::post('otp/verify', [\App\Http\Controllers\Auth\RegistrationOrchestrationController::class, 'verifyOtp'])
+        Route::post('otp/verify', [RegistrationOrchestrationController::class, 'verifyOtp'])
             ->name('otp.verify');
 
-        Route::post('account', [\App\Http\Controllers\Auth\RegistrationOrchestrationController::class, 'createAccount'])
+        Route::post('account', [RegistrationOrchestrationController::class, 'createAccount'])
             ->name('account.create');
+
+        Route::post('identity-documents', [RegistrationIdentityDocumentController::class, 'store'])
+            ->name('identity-documents.store');
+
+        Route::get('identity-documents', [RegistrationIdentityDocumentController::class, 'index'])
+            ->name('identity-documents.index');
+
+        Route::delete('identity-documents/{document}', [RegistrationIdentityDocumentController::class, 'destroy'])
+            ->name('identity-documents.destroy');
     });
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
