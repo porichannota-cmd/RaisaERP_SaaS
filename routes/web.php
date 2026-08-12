@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\Media\MediaDeliveryController;
+use App\Http\Controllers\Api\Media\MediaUploadController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -11,6 +13,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
+
+    // Media
+    Route::post('api/media', [MediaUploadController::class, 'store'])->name('api.media.store');
+    Route::get('api/media/{id}', [MediaDeliveryController::class, 'show'])->name('api.media.show');
 });
 
 require __DIR__.'/settings.php';

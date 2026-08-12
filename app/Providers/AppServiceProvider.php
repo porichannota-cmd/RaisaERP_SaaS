@@ -12,6 +12,8 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(\App\Domain\IAM\Contracts\ScopeTargetValidator::class, \App\Domain\IAM\Services\DefaultScopeTargetValidator::class);
+        $this->app->singleton(\App\Domain\Media\Contracts\MalwareScannerInterface::class, \App\Domain\Media\Services\NullMalwareScanner::class);
+        $this->app->singleton(\App\Domain\Media\Contracts\ImageOptimizerInterface::class, \App\Domain\Media\Services\InterventionImageOptimizer::class);
     }
 
     /**
