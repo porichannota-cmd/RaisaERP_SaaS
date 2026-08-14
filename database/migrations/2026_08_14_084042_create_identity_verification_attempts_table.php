@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('identity_verification_attempts', function (Blueprint $table) {
             $table->ulid('id')->primary();
-            $table->foreignUlid('user_identity_verification_id')->constrained('user_identity_verifications')->onDelete('cascade');
+            $table->foreignUlid('user_identity_verification_id')->constrained('user_identity_verifications', indexName: 'fk_id_verif_attempts_uv_id')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('provider');
             $table->string('operation'); // 'extract' or 'verify'

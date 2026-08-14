@@ -36,4 +36,5 @@ Wave 2E establishes the foundational domain models, schema, and provider abstrac
 *   **Manual Review Status:** Manual Review state foundation exists, but Super Admin adjudication UI is NOT IMPLEMENTED.
 *   **Audit Status:** DEFERRED / ARCHITECTURE LIMITATION.
 *   **Outbox Status:** DEFERRED.
-*   **MySQL 8 Status:** PENDING REMOTE CI.
+*   **LOCAL MARIADB FRESH MIGRATION:** VERIFIED.
+*   **MYSQL 8 WAVE 2E:** PENDING REMOTE RE-CERTIFICATION.
