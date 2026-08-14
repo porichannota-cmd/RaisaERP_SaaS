@@ -4,13 +4,19 @@ use App\Http\Controllers\Profile\AddressController;
 use App\Http\Controllers\Profile\BankAccountController;
 use App\Http\Controllers\Profile\ConsentController;
 use App\Http\Controllers\Profile\ContactController;
+use App\Http\Controllers\Profile\IdentityVerificationController;
 use App\Http\Controllers\Profile\MfsAccountController;
 use App\Http\Controllers\Profile\OnboardingController;
 use App\Http\Controllers\Profile\PersonalController;
+use App\Http\Middleware\EnforceAccountAccess;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', \App\Http\Middleware\EnforceAccountAccess::class])->group(function () {
+Route::middleware(['auth', EnforceAccountAccess::class])->group(function () {
     Route::get('profile', [OnboardingController::class, 'index'])->name('profile');
+
+    Route::get('profile/identity-verification', [IdentityVerificationController::class, 'show'])->name('profile.identity-verification.show');
+    Route::post('profile/identity-verification/extract', [IdentityVerificationController::class, 'extract'])->name('profile.identity-verification.extract');
+    Route::post('profile/identity-verification/verify', [IdentityVerificationController::class, 'verify'])->name('profile.identity-verification.verify');
 
     Route::patch('profile/personal', [PersonalController::class, 'update'])->name('profile.personal.update');
     Route::patch('profile/contact', [ContactController::class, 'update'])->name('profile.contact.update');

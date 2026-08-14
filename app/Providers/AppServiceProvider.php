@@ -2,6 +2,22 @@
 
 namespace App\Providers;
 
+use App\Domain\IAM\Contracts\ScopeTargetValidator;
+use App\Domain\IAM\Services\AuthorizationResolver;
+use App\Domain\IAM\Services\DefaultScopeTargetValidator;
+use App\Domain\Identity\Contracts\IdentityDocumentExtractionInterface;
+use App\Domain\Identity\Contracts\IdentityVerificationProviderInterface;
+use App\Domain\Identity\Providers\NullIdentityDocumentExtractionProvider;
+use App\Domain\Identity\Providers\NullIdentityVerificationProvider;
+use App\Domain\Media\Contracts\ImageOptimizerInterface;
+use App\Domain\Media\Contracts\MalwareScannerInterface;
+use App\Domain\Media\Services\InterventionImageOptimizer;
+use App\Domain\Media\Services\NullMalwareScanner;
+use App\Domain\Registration\Contracts\SensitiveDataCipherInterface;
+use App\Domain\Registration\Contracts\SensitiveLookupHasherInterface;
+use App\Domain\Registration\Services\HmacSensitiveLookupHasher;
+use App\Domain\Registration\Services\LaravelSensitiveDataCipher;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -11,12 +27,23 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(\App\Domain\IAM\Contracts\ScopeTargetValidator::class, \App\Domain\IAM\Services\DefaultScopeTargetValidator::class);
-        $this->app->singleton(\App\Domain\Media\Contracts\MalwareScannerInterface::class, \App\Domain\Media\Services\NullMalwareScanner::class);
-        $this->app->singleton(\App\Domain\Media\Contracts\ImageOptimizerInterface::class, \App\Domain\Media\Services\InterventionImageOptimizer::class);
+        $this->app->singleton(ScopeTargetValidator::class, DefaultScopeTargetValidator::class);
+        $this->app->singleton(MalwareScannerInterface::class, NullMalwareScanner::class);
+        $this->app->singleton(ImageOptimizerInterface::class, InterventionImageOptimizer::class);
 
-        $this->app->singleton(\App\Domain\Registration\Contracts\SensitiveDataCipherInterface::class, \App\Domain\Registration\Services\LaravelSensitiveDataCipher::class);
-        $this->app->singleton(\App\Domain\Registration\Contracts\SensitiveLookupHasherInterface::class, \App\Domain\Registration\Services\HmacSensitiveLookupHasher::class);
+        $this->app->singleton(SensitiveDataCipherInterface::class, LaravelSensitiveDataCipher::class);
+        $this->app->singleton(SensitiveLookupHasherInterface::class, HmacSensitiveLookupHasher::class);
+
+        // Identity Providers
+        $this->app->singleton(IdentityDocumentExtractionInterface::class, function ($app) {
+            // In future, resolve based on config('identity.extraction_provider')
+            return new NullIdentityDocumentExtractionProvider;
+        });
+
+        $this->app->singleton(IdentityVerificationProviderInterface::class, function ($app) {
+            // In future, resolve based on config('identity.verification_provider')
+            return new NullIdentityVerificationProvider;
+        });
     }
 
     /**
@@ -24,7 +51,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        \Illuminate\Support\Facades\Gate::before(function ($user, $ability, $arguments = []) {
+        Gate::before(function ($user, $ability, $arguments = []) {
             $scopeType = null;
             $scopeId = null;
 
@@ -35,7 +62,7 @@ class AppServiceProvider extends ServiceProvider
                 }
             }
 
-            $resolver = app(\App\Domain\IAM\Services\AuthorizationResolver::class);
+            $resolver = app(AuthorizationResolver::class);
 
             if ($resolver->check($user, $ability, $scopeType, $scopeId)) {
                 return true;

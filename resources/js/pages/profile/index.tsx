@@ -7,6 +7,7 @@ import AddressSection from './sections/address-section';
 import BankingSection from './sections/banking-section';
 import MfsSection from './sections/mfs-section';
 import ConsentSection from './sections/consent-section';
+import IdentitySection from './sections/identity-section';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -22,6 +23,7 @@ export default function ProfileOnboarding({
     bankAccounts,
     mfsAccounts,
     consents,
+    identityStatus,
 }: {
     profile: Record<string, unknown> | null;
     contact: Record<string, unknown> | null;
@@ -29,6 +31,7 @@ export default function ProfileOnboarding({
     bankAccounts: Record<string, unknown>[];
     mfsAccounts: Record<string, unknown>[];
     consents: Record<string, unknown>[];
+    identityStatus?: { status: string; manualReviewRequired: boolean; maskedNid: string | null };
 }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -40,6 +43,9 @@ export default function ProfileOnboarding({
                 </div>
 
                 <div className="space-y-12">
+                    <IdentitySection identityStatus={identityStatus} />
+                    <hr className="border-border" />
+
                     <PersonalSection profile={profile} />
                     <hr className="border-border" />
 
