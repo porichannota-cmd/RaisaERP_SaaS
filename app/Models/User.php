@@ -52,4 +52,39 @@ class User extends Authenticatable
             'two_factor_enabled' => 'boolean',
         ];
     }
+
+    public function profile()
+    {
+        return $this->hasOne(UserProfile::class);
+    }
+
+    public function contactDetail()
+    {
+        return $this->hasOne(UserContactDetail::class);
+    }
+
+    public function addresses()
+    {
+        return $this->hasMany(UserAddress::class);
+    }
+
+    public function bankAccounts()
+    {
+        return $this->hasMany(UserBankAccount::class);
+    }
+
+    public function mfsAccounts()
+    {
+        return $this->hasMany(UserMfsAccount::class);
+    }
+
+    public function consents()
+    {
+        return $this->hasMany(UserConsent::class);
+    }
+
+    public function sectionStatuses()
+    {
+        return $this->hasMany(ProfileSectionStatus::class);
+    }
 }

@@ -14,6 +14,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(\App\Domain\IAM\Contracts\ScopeTargetValidator::class, \App\Domain\IAM\Services\DefaultScopeTargetValidator::class);
         $this->app->singleton(\App\Domain\Media\Contracts\MalwareScannerInterface::class, \App\Domain\Media\Services\NullMalwareScanner::class);
         $this->app->singleton(\App\Domain\Media\Contracts\ImageOptimizerInterface::class, \App\Domain\Media\Services\InterventionImageOptimizer::class);
+
+        $this->app->singleton(\App\Domain\Registration\Contracts\SensitiveDataCipherInterface::class, \App\Domain\Registration\Services\LaravelSensitiveDataCipher::class);
+        $this->app->singleton(\App\Domain\Registration\Contracts\SensitiveLookupHasherInterface::class, \App\Domain\Registration\Services\HmacSensitiveLookupHasher::class);
     }
 
     /**

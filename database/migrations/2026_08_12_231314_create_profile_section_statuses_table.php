@@ -1,0 +1,34 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('profile_section_statuses', function (Blueprint $table) {
+            $table->ulid('id')->primary();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+
+            $table->string('section'); // PERSONAL, CONTACT, ADDRESS, BANKING, MFS, CONSENTS
+            $table->string('status'); // NOT_STARTED, IN_PROGRESS, COMPLETE, NEEDS_REVIEW
+
+            $table->timestamps();
+
+            $table->unique(['user_id', 'section']);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('profile_section_statuses');
+    }
+};
