@@ -46,6 +46,7 @@ enum AccountStatus: string
             self::PROFILE_INCOMPLETE,
             self::PENDING_APPROVAL,
             self::ACTIVE,
+            self::REJECTED,
         ]);
     }
 
@@ -63,7 +64,6 @@ enum AccountStatus: string
     public function isHardBlocked(): bool
     {
         return in_array($this, [
-            self::REJECTED,
             self::SUSPENDED,
             self::BLOCKED,
         ]);
