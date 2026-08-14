@@ -56,3 +56,17 @@ The implementation adheres strictly to the Principal Architect's decisions (`PA-
 - MySQL 8 Wave 2D: PENDING REMOTE CI
 
 **Status:** APPROVED FOR STAGING/CI PROVISIONING PREFLIGHT.
+
+## Remote CI Failure Root Cause
+REMOTE FAILURE ROOT CAUSE = TEST ENVIRONMENT CONFIGURATION
+The exact-SHA remote GitHub Actions tests workflow failed (exit code 2) because `phpunit.xml` lacked the `SENSITIVE_LOOKUP_SECRET` environment variable. This caused `hash_hmac()` to throw a fatal error when calculating financial account fingerprints during `Wave2DProfileTest`.
+
+## MySQL 8 Status
+MYSQL 8 MIGRATION = REMOTE VERIFIED / PASS
+MYSQL 8 FULL TEST SUITE = PENDING REMOTE RERUN
+
+## Remediation
+Added `SENSITIVE_LOOKUP_SECRET` to the `<php>` block within `phpunit.xml` to match the existing secure testing context variables.
+
+## Local Reproduction Result
+Local execution of `php artisan test` and `php artisan test --filter Wave2DProfileTest` completely passed after the fix. The `build`, `lint`, and `diff --check` commands passed successfully.
