@@ -11,9 +11,11 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::middleware(['workspace.access', 'tenant.active'])->group(function () {
+        Route::get('dashboard', function () {
+            return Inertia::render('dashboard');
+        })->name('dashboard');
+    });
 
     // Media
     Route::post('api/media', [MediaUploadController::class, 'store'])->name('api.media.store');

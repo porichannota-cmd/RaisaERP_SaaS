@@ -19,6 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->append(\App\Http\Middleware\CorrelationIdMiddleware::class);
         $middleware->append(\App\Http\Middleware\SecurityHeadersMiddleware::class);
+        $middleware->alias([
+            'tenant.active' => \App\Http\Middleware\ActiveTenantMiddleware::class,
+            'account.access' => \App\Http\Middleware\EnforceAccountAccess::class,
+            'workspace.access' => \App\Http\Middleware\EnforceWorkspaceAccess::class,
+        ]);
     })
         ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->shouldRenderJsonWhen(function (\Illuminate\Http\Request $request, \Throwable $e) {

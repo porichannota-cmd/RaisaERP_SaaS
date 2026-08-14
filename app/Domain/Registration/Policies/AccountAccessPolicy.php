@@ -36,4 +36,27 @@ class AccountAccessPolicy
     {
         return ! $user->account_status->isActive();
     }
+
+    /**
+     * Determine if the user is permitted to access operational workspaces.
+     */
+    public function mayAccessWorkspace(User $user): bool
+    {
+        return $user->account_status !== null && $user->account_status->isActive();
+    }
+
+    /**
+     * Ensure the user is permitted to access operational workspaces.
+     *
+     * @throws ValidationException if the account is not in ACTIVE state.
+     */
+    public function ensureCanAccessWorkspace(User $user): void
+    {
+        if (! $this->mayAccessWorkspace($user)) {
+            // Use a 403-equivalent rejection for workspace boundaries.
+            throw ValidationException::withMessages([
+                'workspace' => __('This account is not eligible for operational workspace access.'),
+            ])->status(403);
+        }
+    }
 }
