@@ -12,9 +12,7 @@ Route::get('/', function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::middleware(['workspace.access', 'tenant.active'])->group(function () {
-        Route::get('dashboard', function () {
-            return Inertia::render('dashboard');
-        })->name('dashboard');
+        Route::get('dashboard', [\App\Http\Controllers\Business\TenantDashboardController::class, 'index'])->name('dashboard');
     });
 
     // Media

@@ -1,4 +1,5 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
+import { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 
 interface Workspace {
@@ -12,13 +13,12 @@ interface WorkspaceIndexProps {
 }
 
 export default function WorkspaceIndex({ workspaces }: WorkspaceIndexProps) {
-    const { post, processing } = useForm({
-        tenant_id: '',
-    });
+    const [loadingId, setLoadingId] = useState<string | null>(null);
 
     const handleSwitch = (tenantId: string) => {
-        post(route('workspaces.switch'), {
-            data: { tenant_id: tenantId },
+        setLoadingId(tenantId);
+        router.post(route('workspaces.switch'), { tenant_id: tenantId }, {
+            onFinish: () => setLoadingId(null)
         });
     };
 
@@ -55,7 +55,7 @@ export default function WorkspaceIndex({ workspaces }: WorkspaceIndexProps) {
                                             </p>
                                             <button
                                                 onClick={() => handleSwitch(workspace.id)}
-                                                disabled={processing}
+                                                disabled={loadingId === workspace.id}
                                                 className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:opacity-50"
                                             >
                                                 Enter Workspace

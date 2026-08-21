@@ -58,27 +58,33 @@ class SecurityHeadersMiddleware
     private function buildCsp(): string
     {
         // Production-safe base directives. These never change.
+        $defaultSrc    = "'self'";
         $scriptSrc     = "'self' 'unsafe-inline' 'unsafe-eval'";
         $scriptSrcElem = "'self' 'unsafe-inline'";
         $styleSrc      = "'self' 'unsafe-inline' " . self::BUNNY_FONT_ORIGIN;
         $connectSrc    = "'self'";
         $fontSrc       = "'self' data: " . self::BUNNY_FONT_ORIGIN;
+        $imgSrc        = "'self' data:";
 
         // Local-only exception: allow the deterministic Vite dev server origin.
         // Firefox enforces script-src-elem separately for <script type="module">.
         // app()->environment('local') returns true only when APP_ENV=local.
         if (app()->environment('local')) {
+            $defaultSrc    .= ' ' . self::VITE_DEV_ORIGIN;
             $scriptSrc     .= ' ' . self::VITE_DEV_ORIGIN;
             $scriptSrcElem .= ' ' . self::VITE_DEV_ORIGIN;
+            $styleSrc      .= ' ' . self::VITE_DEV_ORIGIN;
+            $imgSrc        .= ' ' . self::VITE_DEV_ORIGIN;
+            $fontSrc       .= ' ' . self::VITE_DEV_ORIGIN;
             $connectSrc    .= ' ' . self::VITE_DEV_ORIGIN . ' ' . self::VITE_DEV_WS_ORIGIN;
         }
 
         return implode('; ', [
-            "default-src 'self'",
+            "default-src {$defaultSrc}",
             "script-src {$scriptSrc}",
             "script-src-elem {$scriptSrcElem}",
             "style-src {$styleSrc}",
-            "img-src 'self' data:",
+            "img-src {$imgSrc}",
             "font-src {$fontSrc}",
             "connect-src {$connectSrc}",
         ]);
