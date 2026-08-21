@@ -18,4 +18,12 @@ export default defineConfig({
     esbuild: {
         jsx: 'automatic',
     },
+    // Bind the dev server to IPv4 loopback so injected script URLs always use
+    // http://127.0.0.1:5173 — matching the local-only CSP exception below.
+    // Production builds are unaffected; this key is ignored by `vite build`.
+    server: {
+        host: '127.0.0.1',
+        port: 5173,
+        strictPort: true,
+    },
 });

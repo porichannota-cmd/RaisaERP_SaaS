@@ -1,13 +1,22 @@
-import React from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
-import AppLayout from '@/layouts/AppLayout';
+import AppLayout from '@/layouts/app-layout';
 
-export default function WorkspaceIndex({ workspaces }) {
+interface Workspace {
+    id: string;
+    name: string;
+    status: string;
+}
+
+interface WorkspaceIndexProps {
+    workspaces: Workspace[];
+}
+
+export default function WorkspaceIndex({ workspaces }: WorkspaceIndexProps) {
     const { post, processing } = useForm({
         tenant_id: '',
     });
 
-    const handleSwitch = (tenantId) => {
+    const handleSwitch = (tenantId: string) => {
         post(route('workspaces.switch'), {
             data: { tenant_id: tenantId },
         });
@@ -22,7 +31,7 @@ export default function WorkspaceIndex({ workspaces }) {
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">
                             <h2 className="text-2xl font-semibold mb-6">My Workspaces</h2>
-                            
+
                             {workspaces.length === 0 ? (
                                 <div className="text-center py-10">
                                     <p className="text-gray-500 mb-4">You do not have any active workspaces.</p>
@@ -36,7 +45,7 @@ export default function WorkspaceIndex({ workspaces }) {
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {workspaces.map((workspace) => (
-                                        <div 
+                                        <div
                                             key={workspace.id}
                                             className="border rounded-lg p-6 hover:shadow-md transition-shadow"
                                         >
